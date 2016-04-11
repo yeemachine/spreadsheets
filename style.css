@@ -1,0 +1,68 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+@keyframes
+appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+*{
+  font-family: "Open Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  animation: appear 1s;
+  font-weight: 400;
+  font-style: normal;
+}
+
+html{
+  background-color: #181e1f;
+}
+a:link{
+text-decoration: none;
+color:#181e1f;
+}
+a:visited {
+    color: #181e1f;
+}
+#map {
+  height:500px;
+  width:auto;
+}
+ul {
+  position:absolute;
+  left:100px;
+  top:5px;
+  height:500px;
+  width: 300px;
+  text-decoration: none;
+  list-style: none;
+  color:gainsboro;
+}
+h1{
+  text-align: left;
+  padding-top: 30px;
+  padding-left: 130px;
+  color:gainsboro;
+  font-size: 50px;
+}
+h2{
+  position:absolute;
+  right:30px;
+  height:50px;
+  z-index: -1;
+
+}
+img{
+  height:150px;
+}
+div{
+  margin: 0;
+}
+section{
+  display: flex;
+  flex-direction: row;
+
+}

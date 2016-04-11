@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDD3o_vzkcWmw4-yDtuFZ0F4lioqWn8eU8"></script>
+    <script src="draw.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.3.5/tabletop.min.js"></script>
+		<script src="https://cdn.rawgit.com/CooperUnion/javascript-learning/master/tabletop-simple.js"></script>
+    <!-- <script src="http://cooper-union-maps-proxy.herokuapp.com/js/draw.js"></script> -->
+
+    <script>
+    $(document).ready(function(){
+      var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1kFfQU9CHggv0tSXmaFUWABpH7AvSnf8FhAnH4QjMy8A/pubhtml';
+      getSpreadsheetJSON(public_spreadsheet_url, function(spread){
+					console.log(spread[0]);
+					for(var i=0; i<spread.length; i++) {
+            $("html").css({
+
+              "background-color":spread[0].color,
+
+						});
+
+            $("ul").css({
+							"color":spread[1].color,
+              "fontSize":spread[0].size,
+              "z-index":spread[3].order,
+
+						});
+
+						$("h1").css({
+              "z-index":spread[1].order,
+
+						});
+
+            $("#map").css({
+
+							"height":spread[4].size,
+              "z-index":spread[2].order,
+						});
+
+            $("img").css({
+
+              "height":spread[3].size,
+              "width":spread[1].size
+              "z-index":spread[0].order,
+            });
+
+					}
+				});
+
+
+        var answer=prompt("Who do you want to look up?");
+      $.getJSON('http://cooper-union-instagram-proxy.herokuapp.com/search/user/'+ answer  , function(name){
+        console.log(name);
+        console.log(name[0].id);
+        var userid=name[0].id;
+        console.log(name[0].full_name);
+        $("h1").html(name[0].full_name+"\'s Adventures");
+
+
+      $.getJSON("http://cooper-union-instagram-proxy.herokuapp.com/user/"+userid+ "/recent?count=33", function(response){
+
+
+        console.log(response);
+        var howMany = 0;
+        var positionsOfPhotos = [];
+        var latTotal = 0;
+        var latCount = 0;
+        var longTotal = 0;
+        var longCount = 0;
+        for(var i=0; i<response.length; i++) {
+          // $("body").append("<img src="+response[i].images.thumbnail.url+" />");
+          if((response[i].location) && (response[i].location.latitude !== null)) {
+            howMany++;
+            var date = new Date(parseInt(response[i].created_time) * 1000);
+            $("ul").prepend("<li>"+(date.getMonth()+1)+"-"+date.getDate()+"-"+date.getFullYear()+" "+response[i].location.name)+"</li>";
+
+              date = null;
+
+
+            var position = {
+              // "title":response[i].caption.text,
+
+              "map": new google.maps.LatLng(response[i].location.latitude,response[i].location.longitude),
+              "link":response[i].link,
+              'html': '<a href="' + response[i].link + '">' + '<img src=' + response[i].images.low_resolution.url + '/></a><br></br>',
+
+            }
+
+            if((response[i].caption) && (response[i].caption.text !== null)) {
+              position.title = response[i].caption.text;
+              console.log(position.title);
+            }
+          else{
+            position.title = "...";
+          }
+
+            latCount++;
+            latTotal += response[i].location.latitude;
+            longCount++;
+            longTotal += response[i].location.longitude;
+
+
+            positionsOfPhotos.push(position);
+          }
+        }
+
+
+        console.log(howMany)
+        console.log(positionsOfPhotos)
+        var finallat = latTotal/latCount
+        var finallong = longTotal/longCount
+        console.log(finallat)
+        console.log(finallong)
+        var mapOptions = {
+          zoom: 5,
+          center: new google.maps.LatLng(finallat,finallong),
+          styles: [{"featureType":"all","elementType":"labels.text.fill","stylers":[{"saturation":36},{"color":"#000000"},{"lightness":40}]},{"featureType":"all","elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#000000"},{"lightness":16}]},{"featureType":"all","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#000000"},{"lightness":20}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"lightness":17},{"weight":1.2}]},{"featureType":"administrative.country","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"administrative.locality","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"administrative.neighborhood","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":20}]},{"featureType":"landscape.natural.landcover","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"landscape.natural.terrain","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":21}]},{"featureType":"poi.attraction","elementType":"labels.icon","stylers":[{"visibility":"on"},{"hue":"#ff0000"},{"saturation":"15"},{"weight":"3.91"}]},{"featureType":"poi.business","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"poi.medical","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"poi.park","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"poi.school","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"poi.sports_complex","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#000000"},{"lightness":17}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"lightness":29},{"weight":0.2}]},{"featureType":"road.highway","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":18}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":16}]},{"featureType":"road.local","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#000000"},{"lightness":19}]},{"featureType":"transit","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"transit.line","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"transit.station.bus","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"transit.station.rail","elementType":"labels.icon","stylers":[{"visibility":"on"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#0f252e"},{"lightness":17}]},{"featureType":"water","elementType":"labels.icon","stylers":[{"visibility":"off"}]}]
+        };
+
+
+        draw('map', mapOptions, positionsOfPhotos);
+
+
+      });
+      });
+      });
+    </script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+  </head>
+  <body>
+    <div id="map"></div>
+    <ul></ul>
+    <section>
+
+  <h1></h1>
+  <h2><img src="http://www.vrhunters.pl/nowy-content/uploads/2015/09/Oculus-Ready.jpg"/><h2>
+</section>
+
+
+  </body>
+</html>
